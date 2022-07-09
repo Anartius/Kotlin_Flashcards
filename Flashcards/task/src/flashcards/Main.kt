@@ -1,5 +1,10 @@
 package flashcards
 
 fun main() {
-    println("Hello, World!")
+    println("""
+        Card:
+        front
+        Definition:
+        back
+    """.trimIndent())
 }
