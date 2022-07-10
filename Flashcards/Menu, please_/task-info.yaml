@@ -415,6 +415,12 @@ files:
     Abuja\",\n                \"Berlin\"\n        );\n    }\n    \n}\n\n\n\n\n\n\n\
     \n\n\n\n\n"
   learner_created: false
+- name: flashcards.json
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/83/stages/461/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Sun, 10 Jul 2022 15:45:07 UTC
 record: -1
