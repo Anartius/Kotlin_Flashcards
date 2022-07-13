@@ -65,7 +65,7 @@ files:
     );\n        }\n        \n        return CheckResult.correct();\n        \n   \
     \ }\n    \n}\n"
   learner_created: false
-feedback_link: https://hyperskill.org/projects/83/stages/458/implement#comment
+feedback_link: https://hyperskill.org/learn/step/7487#comment
 status: Solved
 feedback:
   message: Congratulations!

@@ -1202,6 +1202,23 @@ files:
 
 
   learner_created: false
-feedback_link: https://hyperskill.org/projects/83/stages/462/implement#comment
-status: Unchecked
+- name: flashcards.json
+  visible: true
+  text: |-
+    [
+      {
+        "term": "Japan",
+        "definition": "Tokyo"
+      },
+      {
+        "term": "France",
+        "definition": "Paris"
+      }
+    ]
+  learner_created: true
+feedback_link: https://hyperskill.org/learn/step/7491#comment
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Wed, 13 Jul 2022 23:27:44 UTC
 record: -1
