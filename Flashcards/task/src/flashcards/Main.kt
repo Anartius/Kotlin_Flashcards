@@ -8,7 +8,7 @@ import kotlin.system.exitProcess
 
 val log = mutableListOf<String>()
 
-fun main() {
+fun main(args: Array<String>) {
     val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     val type = Types.newParameterizedType(
         MutableMap::class.java,
@@ -19,7 +19,16 @@ fun main() {
     )
     val flashCardAdapter = moshi.adapter<MutableMap<String, Map<String, Int>>>(type)
     var flashCards = mutableMapOf<String, Map<String, Int>>()
+    var file: File
 
+    val argsIOList = getIOFromArgs(args.toList())
+    if (argsIOList[0].isNotEmpty()) {
+        try {
+            val argFileName = argsIOList[0]
+            file = File(argFileName)
+            flashCards.putAll(import(flashCardAdapter, file))
+        } catch (e: Exception) { }
+    }
 
     while (true) {
         printLnAndLog("Input the action (add, remove, import, export," +
@@ -29,13 +38,28 @@ fun main() {
 
             "remove" -> flashCards = removeFlashCard(flashCards)
 
-            "import" -> flashCards.putAll(import(flashCardAdapter))
+            "import" -> {
+                printLnAndLog("File name:")
+                file = File(readLnAndLog())
 
-            "export" -> export(flashCardAdapter, flashCards)
+                if (file.exists()) {
+                    flashCards.putAll(import(flashCardAdapter, file))
+                } else printLnAndLog("File not found.")
+            }
+
+            "export" -> {
+                printLnAndLog("File name:")
+                file = File(readLnAndLog())
+                export(flashCardAdapter, flashCards, file)
+            }
 
             "ask" -> flashCards = checkAnswers(flashCards)
 
             "exit" -> {
+                if (argsIOList[1].isNotEmpty()) {
+                    file = File(argsIOList[1])
+                    export(flashCardAdapter, flashCards, file)
+                }
                 printLnAndLog("Bye bye!")
                 exitProcess(0)
             }
@@ -49,6 +73,21 @@ fun main() {
             else -> printLnAndLog("Wrong action input.")
         }
     }
+}
+
+
+fun getIOFromArgs(args: List<String>) : List<String> {
+
+    val list = mutableListOf("", "")
+
+    try {
+        for (i in 0 until args.size - 1) {
+            if (args[i] == "-import") list[0] = args[i + 1]
+            if (args[i] == "-export") list[1] = args[i + 1]
+        }
+    } catch (e: Exception) { }
+
+    return list.toList()
 }
 
 
@@ -95,30 +134,23 @@ fun removeFlashCard(flashCards: MutableMap<String, Map<String, Int>>) :
 }
 
 
-fun import(flashCardAdapter: JsonAdapter<MutableMap<String, Map<String, Int>>>) :
-        MutableMap<String, Map<String, Int>> {
+fun import(flashCardAdapter: JsonAdapter<MutableMap<String, Map<String, Int>>>,
+           file: File) : MutableMap<String, Map<String, Int>> {
 
     val impFlashCards = mutableMapOf<String, Map<String, Int>>()
-    printLnAndLog("File name:")
-    val file = File(readLnAndLog())
 
-    if (file.exists()) {
-        try {
-            flashCardAdapter.fromJson(file.readText())?.let { mapEntry ->
-                mapEntry.forEach {
-                    impFlashCards[it.key] = mapOf(
-                        Pair(
-                            it.value.keys.joinToString(""),
-                            it.value.values.joinToString("").toDouble().toInt()
-                        )
+    try {
+        flashCardAdapter.fromJson(file.readText())?.let { mapEntry ->
+            mapEntry.forEach {
+                impFlashCards[it.key] = mapOf(
+                    Pair(
+                        it.value.keys.joinToString(""),
+                        it.value.values.joinToString("").toDouble().toInt()
                     )
-                }
+                )
             }
-        } catch (e:Exception) { }
-    } else {
-        printLnAndLog("File not found.")
-        return impFlashCards
-    }
+        }
+    } catch (e:Exception) { }
 
     printLnAndLog("${impFlashCards.size} cards have been loaded.")
     return impFlashCards
@@ -126,10 +158,8 @@ fun import(flashCardAdapter: JsonAdapter<MutableMap<String, Map<String, Int>>>) 
 
 
 fun export(flashCardAdapter: JsonAdapter<MutableMap<String, Map<String, Int>>>,
-           flashCards: MutableMap<String, Map<String, Int>>) {
+           flashCards: MutableMap<String, Map<String, Int>>, file: File) {
 
-    printLnAndLog("File name:")
-    val file = File(readLnAndLog())
     file.writeText(flashCardAdapter.indent("  ").toJson(flashCards))
     printLnAndLog("${flashCards.size} cards have been saved.")
 }
